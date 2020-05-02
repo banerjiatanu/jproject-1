@@ -1,0 +1,24 @@
+--- # Creating simple web servers
+- hosts: webservers
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Installing package
+      yum:
+        name: httpd
+        state: present
+      notify: start the service
+    - name: copy index.html file
+      template: src=/home/ansible/files/index.html.j2 dest=/var/www/html/index.html
+    - name: copy configuration file - httpd.conf
+      template: src=/home/ansible/files/httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf
+      notify: start the service
+    - name: service to start
+      service:
+        name: httpd
+        state: started
+  handlers:
+    - name: start the service
+      service:
+        name: httpd
+        state: restarted
